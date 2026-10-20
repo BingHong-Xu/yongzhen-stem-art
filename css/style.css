@@ -293,12 +293,15 @@ body {
   overflow: hidden;
   box-shadow: 0 0 35px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05);
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .stained-glass-canvas {
   width: 100%;
   height: 260px;
   display: block;
+  touch-action: none;
 }
 
 @media (min-width: 640px) {
@@ -315,12 +318,36 @@ body {
   border-radius: 10px;
   box-shadow: 0 8px 25px rgba(0,0,0,0.4);
   display: block;
+  touch-action: manipulation;
+  transition: filter 0.15s ease;
+}
+
+.mondrian-canvas:active {
+  filter: brightness(0.97);
 }
 
 @media (min-width: 640px) {
   .mondrian-canvas {
     height: 320px;
   }
+}
+
+/* Lab 2: Student Works Preview in Emotion Explorer */
+.lab-preview-card {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lab-preview-card:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.5);
+}
+
+.lab-color-pill {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.lab-color-pill:hover {
+  transform: scale(1.08);
 }
 
 /* Touch Targets */

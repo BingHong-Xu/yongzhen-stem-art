@@ -456,6 +456,16 @@ const App = {
 
     this.currentPage = 1;
     this.updateFilteredWorks();
+
+    // If searching a specific emotion tag in 'emotion' category yields 0 results, fall back to searching in 'all' categories
+    if (category === 'emotion' && subSearch && this.filteredWorks.length === 0) {
+      this.currentCategory = 'all';
+      document.querySelectorAll('.gallery-filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.category === 'all');
+      });
+      this.updateFilteredWorks();
+    }
+
     this.renderGallery();
 
     const gallerySection = document.getElementById('gallerySection');
@@ -817,6 +827,28 @@ const App = {
       this.openLightbox(this.currentLightboxIndex + 1);
     } else {
       this.openLightbox(0);
+    }
+  },
+
+  openLightboxByWork(item) {
+    if (!item) return;
+    if (!this.filteredWorks || this.filteredWorks.length === 0) {
+      this.filteredWorks = (this.data && this.data.student_works) ? [...this.data.student_works] : [item];
+    }
+    const idx = this.filteredWorks.findIndex(w => w.id === item.id);
+    if (idx !== -1) {
+      this.openLightbox(idx);
+    } else {
+      this.filteredWorks.unshift(item);
+      this.openLightbox(0);
+    }
+  },
+
+  openWorkInLightbox(id) {
+    const allWorks = (this.data && this.data.student_works) ? this.data.student_works : (window.YONGZHEN_RAW_DATA?.student_works || []);
+    const item = allWorks.find(w => w.id === id);
+    if (item) {
+      this.openLightboxByWork(item);
     }
   },
 
