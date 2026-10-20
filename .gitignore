@@ -1,0 +1,4 @@
+# Gitignore for Yongzhen STEM+Art Showcase
+assets/
+.DS_Store
+Thumbs.db
