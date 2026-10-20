@@ -56,8 +56,8 @@ const App = {
   // --- Hero Stats Counter Animation ---
   renderHeroStats() {
     const stats = [
-      { id: 'statWorks', target: this.data.site_info?.total_artworks || 327, label: '學生原創藝術品' },
-      { id: 'statPhotos', target: this.data.site_info?.total_photos || 217, label: '課堂實踐剪影' },
+      { id: 'statWorks', target: this.data.site_info?.total_artworks || this.data.student_works?.length || 304, label: '學生原創藝術品' },
+      { id: 'statPhotos', target: this.data.site_info?.total_photos || this.data.process_photos?.length || 196, label: '課堂實踐剪影' },
       { id: 'statVideos', target: (this.data.episodes?.length || 0) + (this.data.tutorials?.length || 0), label: '專題影音與示範' },
       { id: 'statSteps', target: this.data.milestones?.length || 18, label: '跨領域實踐歷程' }
     ];
@@ -386,6 +386,17 @@ const App = {
   },
 
   initGallery() {
+    const btnArtworks = document.getElementById('btnTabArtworks');
+    if (btnArtworks) {
+      const count = this.data.student_works?.length || this.data.site_info?.total_artworks || 304;
+      btnArtworks.innerHTML = `<i data-lucide="award" class="w-4 h-4"></i><span>🏆 學生原創藝術品 (${count} 件)</span>`;
+    }
+    const btnProcess = document.getElementById('btnTabProcess');
+    if (btnProcess) {
+      const count = this.data.process_photos?.length || this.data.site_info?.total_photos || 196;
+      btnProcess.innerHTML = `<i data-lucide="camera" class="w-4 h-4"></i><span>📸 課堂實作花絮剪影 (${count} 張)</span>`;
+    }
+
     this.updateFilteredWorks();
     this.renderGallery();
 
