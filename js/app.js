@@ -315,7 +315,7 @@ const App = {
             <p class="text-xs text-slate-400 truncate">${doc.body || '跨領域美感課程完整教學手冊與成果簡報檔案'}</p>
           </div>
         </div>
-        <a href="${(window.location.protocol.startsWith('http') && doc.online_url) ? doc.online_url : (doc.file_url || doc.online_url)}" target="_blank" download class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-bold transition-all flex items-center gap-1.5 flex-shrink-0 touch-target">
+        <a href="${doc.file_url || doc.online_url || '#'}" target="_blank" download class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-bold transition-all flex items-center gap-1.5 flex-shrink-0 touch-target">
           <i data-lucide="download" class="w-3.5 h-3.5"></i>
           <span>下載 PDF</span>
         </a>
@@ -324,6 +324,67 @@ const App = {
   },
 
   // --- Student Works Gallery ---
+  getWorkMedia(item) {
+    const rawLocal = item.image_url || item.local_path || '';
+    const rawOnline = item.online_url || '';
+
+    // Check if local image exists/valid
+    if (rawLocal && (rawLocal.startsWith('assets/images/') || /\.(jpg|jpeg|png|gif|webp|svg)($|\?)/i.test(rawLocal))) {
+      return {
+        type: 'image',
+        src: rawLocal,
+        fallbackSrc: (rawOnline && /\.(jpg|jpeg|png|gif|webp|svg)($|\?)/i.test(rawOnline)) ? rawOnline : ''
+      };
+    }
+
+    // Check if online url is an image
+    if (rawOnline && /\.(jpg|jpeg|png|gif|webp|svg)($|\?)/i.test(rawOnline)) {
+      return {
+        type: 'image',
+        src: rawOnline,
+        fallbackSrc: ''
+      };
+    }
+
+    // Check YouTube
+    const candidateUrl = rawLocal || rawOnline;
+    const ytMatch = candidateUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+    if (ytMatch) {
+      return {
+        type: 'youtube',
+        ytId: ytMatch[1],
+        src: `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`,
+        linkUrl: candidateUrl
+      };
+    }
+
+    // Check external link
+    if (candidateUrl && (candidateUrl.startsWith('http://') || candidateUrl.startsWith('https://'))) {
+      let label = '外部資源連結';
+      let icon = 'external-link';
+      if (candidateUrl.includes('facebook.com')) {
+        label = 'Facebook 成果專頁';
+        icon = 'share-2';
+      } else if (candidateUrl.includes('forms.gle') || candidateUrl.includes('docs.google.com/forms')) {
+        label = 'Google 表單問卷';
+        icon = 'clipboard-check';
+      } else if (candidateUrl.includes('photos.app.goo.gl')) {
+        label = 'Google 相簿紀錄';
+        icon = 'camera';
+      }
+      return {
+        type: 'link',
+        linkUrl: candidateUrl,
+        label,
+        icon
+      };
+    }
+
+    return {
+      type: 'text'
+    };
+  },
+
   initGallery() {
     this.updateFilteredWorks();
     this.renderGallery();
@@ -446,25 +507,46 @@ const App = {
     grid.innerHTML = pageItems.map((item, idx) => {
       const globalIdx = startIdx + idx;
       const authorLabel = item.student_no ? `#${item.student_no} ${item.student_name || ''}`.trim() : '';
-      const itemSrc = (window.location.protocol.startsWith('http') && item.online_url) ? item.online_url : (item.image_url || item.online_url);
-      const hasImage = itemSrc && !itemSrc.toLowerCase().includes('.pdf') && !itemSrc.toLowerCase().includes('.mov') && !itemSrc.toLowerCase().includes('.mp4');
+      const media = this.getWorkMedia(item);
 
       return `
         <div class="glass-card rounded-2xl overflow-hidden group hover:border-indigo-500/50 transition-all flex flex-col justify-between cursor-pointer" onclick="App.openLightbox(${globalIdx})">
-          <div class="gallery-img-container aspect-square bg-slate-900 relative">
-            ${hasImage ? `
-              <img src="${itemSrc}" alt="${item.title}" loading="lazy" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='${item.online_url || ''}';">
-            ` : `
-              <div class="w-full h-full flex flex-col items-center justify-center p-3 text-slate-400 bg-slate-800/40">
+          <div class="gallery-img-container aspect-square bg-slate-900 relative overflow-hidden">
+            ${media.type === 'image' ? `
+              <img src="${media.src}" alt="${item.title}" loading="lazy" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null; if('${media.fallbackSrc}'){this.src='${media.fallbackSrc}'}else{this.style.display='none'; if(this.nextElementSibling)this.nextElementSibling.classList.remove('hidden');}">
+              <div class="hidden w-full h-full flex flex-col items-center justify-center p-3 text-slate-400 bg-slate-800/80">
                 <i data-lucide="palette" class="w-8 h-8 mb-2 text-indigo-400"></i>
-                <span class="text-[11px] font-bold text-center">${item.title}</span>
+                <span class="text-[11px] font-bold text-center text-slate-300">${item.title}</span>
+              </div>
+              <div class="gallery-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity p-3 sm:p-4 flex flex-col justify-end pointer-events-none">
+                <span class="text-[11px] sm:text-xs font-semibold text-indigo-300 flex items-center gap-1 drop-shadow">
+                  <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i> 點擊放大
+                </span>
+              </div>
+            ` : media.type === 'youtube' ? `
+              <img src="${media.src}" alt="${item.title}" loading="lazy" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+              <div class="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/20 transition-all">
+                <span class="w-10 h-10 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-lg">
+                  <i data-lucide="play" class="w-4 h-4 fill-current ml-0.5"></i>
+                </span>
+              </div>
+            ` : media.type === 'link' ? `
+              <div class="w-full h-full flex flex-col items-center justify-center p-4 text-center bg-gradient-to-br from-slate-900 to-indigo-950/40">
+                <div class="w-11 h-11 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                  <i data-lucide="${media.icon || 'external-link'}" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[11px] font-bold text-indigo-200 line-clamp-2 px-2 mb-1">${item.title}</span>
+                <span class="text-[10px] text-slate-400 font-medium">${media.label}</span>
+              </div>
+            ` : `
+              <div class="w-full h-full flex flex-col items-center justify-center p-4 text-center bg-gradient-to-br from-slate-900 to-purple-950/40">
+                <div class="w-11 h-11 rounded-2xl bg-purple-600/20 text-purple-400 border border-purple-500/30 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                  <i data-lucide="sparkles" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[11px] font-bold text-purple-200 line-clamp-2 px-2 mb-1">${item.title}</span>
+                <span class="text-[10px] text-slate-400 font-medium">主題展區導覽解說</span>
               </div>
             `}
-            <div class="gallery-overlay absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity p-3 sm:p-4 flex flex-col justify-end">
-              <span class="text-[11px] sm:text-xs font-semibold text-indigo-300 flex items-center gap-1">
-                <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i> 點擊放大
-              </span>
-            </div>
           </div>
           
           <div class="p-3 sm:p-4">
@@ -579,6 +661,7 @@ const App = {
     if (!modal) return;
 
     const imgEl = document.getElementById('lightboxImg');
+    const placeholderEl = document.getElementById('lightboxPlaceholder');
     const titleEl = document.getElementById('lightboxTitle');
     const tagEl = document.getElementById('lightboxTag');
     const studentEl = document.getElementById('lightboxStudent');
@@ -587,11 +670,103 @@ const App = {
     const countMobileEl = document.getElementById('lightboxCountMobile');
     const rawLinkEl = document.getElementById('lightboxRawLink');
 
-    const itemSrc = (window.location.protocol.startsWith('http') && item.online_url) ? item.online_url : (item.image_url || item.online_url || '');
-    if (imgEl) {
-      imgEl.src = itemSrc;
-      imgEl.alt = item.title;
+    const media = this.getWorkMedia(item);
+
+    if (media.type === 'image') {
+      if (placeholderEl) placeholderEl.classList.add('hidden');
+      if (imgEl) {
+        imgEl.classList.remove('hidden');
+        imgEl.src = media.src;
+        imgEl.alt = item.title;
+        imgEl.onerror = () => {
+          if (media.fallbackSrc && imgEl.src !== media.fallbackSrc) {
+            imgEl.src = media.fallbackSrc;
+            return;
+          }
+          imgEl.classList.add('hidden');
+          if (placeholderEl) {
+            placeholderEl.classList.remove('hidden');
+            placeholderEl.innerHTML = `
+              <div class="w-16 h-16 rounded-2xl bg-slate-800 text-indigo-400 border border-slate-700 flex items-center justify-center mb-3 mx-auto">
+                <i data-lucide="image" class="w-8 h-8"></i>
+              </div>
+              <h4 class="text-base font-bold text-white mb-1">${item.title}</h4>
+              <p class="text-xs text-slate-400">學生作品影像載入中或離線備份</p>
+            `;
+            if (window.lucide) lucide.createIcons();
+          }
+        };
+      }
+      if (rawLinkEl) {
+        rawLinkEl.href = media.src;
+        rawLinkEl.target = '_blank';
+        rawLinkEl.innerHTML = '<i data-lucide="external-link" class="w-3.5 h-3.5"></i> 開啟原圖 / 下載';
+      }
+    } else if (media.type === 'youtube') {
+      if (imgEl) imgEl.classList.add('hidden');
+      if (placeholderEl) {
+        placeholderEl.classList.remove('hidden');
+        placeholderEl.innerHTML = `
+          <div class="w-16 h-16 rounded-full bg-red-600/90 text-white flex items-center justify-center mb-4 mx-auto shadow-lg cursor-pointer hover:scale-105 transition-transform" onclick="App.openVideoModal('${media.linkUrl}', '${encodeURIComponent(item.title)}')">
+            <i data-lucide="play" class="w-8 h-8 fill-current ml-1"></i>
+          </div>
+          <h4 class="text-base sm:text-lg font-bold text-white mb-2">${item.title}</h4>
+          <p class="text-xs text-slate-400 mb-4">點擊下方按鈕以內嵌視窗播放 YouTube 示範影片</p>
+          <button onclick="App.openVideoModal('${media.linkUrl}', '${encodeURIComponent(item.title)}')" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition-all shadow-lg active:scale-95">
+            <i data-lucide="play" class="w-4 h-4 fill-current"></i> 播放 YouTube 影片
+          </button>
+        `;
+        if (window.lucide) lucide.createIcons();
+      }
+      if (rawLinkEl) {
+        rawLinkEl.href = media.linkUrl;
+        rawLinkEl.target = '_blank';
+        rawLinkEl.innerHTML = '<i data-lucide="youtube" class="w-3.5 h-3.5 text-red-400"></i> 前往 YouTube 觀看';
+      }
+    } else if (media.type === 'link') {
+      if (imgEl) imgEl.classList.add('hidden');
+      if (placeholderEl) {
+        placeholderEl.classList.remove('hidden');
+        placeholderEl.innerHTML = `
+          <div class="w-16 h-16 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center mb-4 mx-auto">
+            <i data-lucide="${media.icon || 'external-link'}" class="w-8 h-8"></i>
+          </div>
+          <h4 class="text-base sm:text-lg font-bold text-white mb-1.5">${item.title}</h4>
+          <span class="text-xs text-indigo-300 font-semibold mb-4 inline-block px-3 py-1 rounded-full bg-indigo-950/80 border border-indigo-500/30">${media.label}</span>
+          <div>
+            <a href="${media.linkUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-lg active:scale-95">
+              <span>前往外部連結</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        `;
+        if (window.lucide) lucide.createIcons();
+      }
+      if (rawLinkEl) {
+        rawLinkEl.href = media.linkUrl;
+        rawLinkEl.target = '_blank';
+        rawLinkEl.innerHTML = `<i data-lucide="external-link" class="w-3.5 h-3.5"></i> 開啟外部連結`;
+      }
+    } else {
+      if (imgEl) imgEl.classList.add('hidden');
+      if (placeholderEl) {
+        placeholderEl.classList.remove('hidden');
+        placeholderEl.innerHTML = `
+          <div class="w-16 h-16 rounded-2xl bg-purple-600/20 text-purple-400 border border-purple-500/30 flex items-center justify-center mb-4 mx-auto">
+            <i data-lucide="sparkles" class="w-8 h-8"></i>
+          </div>
+          <h4 class="text-base sm:text-lg font-bold text-white mb-2">${item.title}</h4>
+          <span class="text-xs text-purple-300 font-semibold mb-2 inline-block px-3 py-1 rounded-full bg-purple-950/80 border border-purple-500/30">主題展區導覽解說</span>
+          <p class="text-xs text-slate-400 max-w-sm mx-auto">右側欄位提供六年甲班策展小組的完整創作構想與教學實踐心路歷程。</p>
+        `;
+        if (window.lucide) lucide.createIcons();
+      }
+      if (rawLinkEl) {
+        rawLinkEl.href = '#';
+        rawLinkEl.innerHTML = '';
+      }
     }
+
     if (titleEl) titleEl.innerText = item.title;
     if (tagEl) {
       tagEl.className = `badge-tag badge-${item.category || 'general'}`;
@@ -606,10 +781,6 @@ const App = {
     const countStr = `${index + 1} / ${this.filteredWorks.length}`;
     if (countEl) countEl.innerText = countStr;
     if (countMobileEl) countMobileEl.innerText = countStr;
-
-    if (rawLinkEl) {
-      rawLinkEl.href = itemSrc || '#';
-    }
 
     modal.classList.remove('hidden');
     document.body.classList.add('modal-open');

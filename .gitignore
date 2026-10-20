@@ -1,4 +1,5 @@
 # Gitignore for Yongzhen STEM+Art Showcase
-assets/
+assets/docs/
+assets/videos/
 .DS_Store
 Thumbs.db
