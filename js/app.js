@@ -304,23 +304,63 @@ const App = {
     const container = document.getElementById('documentsContainer');
     if (!container || !this.data.documents) return;
 
-    container.innerHTML = this.data.documents.map(doc => `
-      <div class="glass-card p-4 sm:p-5 rounded-2xl border border-indigo-500/30 flex items-center justify-between gap-4 hover:border-indigo-400 transition-all">
-        <div class="flex items-center gap-3.5 min-w-0">
-          <div class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center flex-shrink-0">
-            <i data-lucide="file-text" class="w-5 h-5"></i>
+    container.innerHTML = this.data.documents.map((doc, idx) => {
+      const targetHref = doc.file_url || doc.online_url || '#';
+      const isPdf = targetHref.toLowerCase().endsWith('.pdf');
+      const isFeatured = idx === 0 && doc.cover_url;
+
+      if (isFeatured) {
+        return `
+          <div class="md:col-span-2 glass-card p-5 sm:p-7 rounded-3xl border-2 border-emerald-500/50 bg-gradient-to-br from-slate-900/95 via-indigo-950/40 to-emerald-950/30 flex flex-col lg:flex-row items-center gap-6 shadow-2xl">
+            <img src="${doc.cover_url}" alt="${doc.title}" class="w-full lg:w-72 h-44 object-cover rounded-2xl border border-slate-700 shadow-lg cursor-pointer hover:scale-[1.02] transition-transform" onclick="App.openPdfModal('${targetHref}', '${encodeURIComponent(doc.title)}')">
+            <div class="flex-1 min-w-0 text-left">
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold mb-2.5">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                <span>最新上傳・2026 畢業成果展完整簡報原檔 (25頁 PDF)</span>
+              </div>
+              <h3 class="text-lg sm:text-2xl font-black text-white mb-2">${doc.title}</h3>
+              <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4">${doc.body || '教育部跨領域美感教育卓越領航計畫・苗栗永貞國小六年甲班成果展完整簡報'}</p>
+              <div class="flex flex-wrap items-center gap-3">
+                <button type="button" onclick="App.openPdfModal('${targetHref}', '${encodeURIComponent(doc.title)}')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-lg flex items-center gap-2 transition-all touch-target">
+                  <i data-lucide="eye" class="w-4 h-4"></i>
+                  <span>線上預覽完整簡報 PDF</span>
+                </button>
+                <a href="${targetHref}" target="_blank" download class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-100 text-xs sm:text-sm font-bold border border-slate-600 flex items-center gap-2 transition-all touch-target">
+                  <i data-lucide="download" class="w-4 h-4 text-emerald-400"></i>
+                  <span>下載 PDF 原檔</span>
+                </a>
+              </div>
+            </div>
           </div>
-          <div class="min-w-0">
-            <h4 class="text-sm font-bold text-white truncate">${doc.title}</h4>
-            <p class="text-xs text-slate-400 truncate">${doc.body || '跨領域美感課程完整教學手冊與成果簡報檔案'}</p>
+        `;
+      }
+
+      return `
+        <div class="glass-card p-4 sm:p-5 rounded-2xl border border-indigo-500/30 flex items-center justify-between gap-4 hover:border-indigo-400 transition-all flex-wrap sm:flex-nowrap">
+          <div class="flex items-center gap-3.5 min-w-0 flex-1">
+            <div class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="file-text" class="w-5 h-5"></i>
+            </div>
+            <div class="min-w-0">
+              <h4 class="text-sm font-bold text-white truncate">${doc.title}</h4>
+              <p class="text-xs text-slate-400 truncate">${doc.body || '跨領域美感課程完整教學手冊與成果簡報檔案'}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            ${isPdf ? `
+              <button type="button" onclick="App.openPdfModal('${targetHref}', '${encodeURIComponent(doc.title)}')" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-indigo-300 text-xs font-bold border border-indigo-500/40 transition-all flex items-center gap-1.5 touch-target">
+                <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                <span>預覽</span>
+              </button>
+            ` : ''}
+            <a href="${targetHref}" target="_blank" download class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-bold transition-all flex items-center gap-1.5 flex-shrink-0 touch-target">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <span>下載 PDF</span>
+            </a>
           </div>
         </div>
-        <a href="${doc.file_url || doc.online_url || '#'}" target="_blank" download class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-bold transition-all flex items-center gap-1.5 flex-shrink-0 touch-target">
-          <i data-lucide="download" class="w-3.5 h-3.5"></i>
-          <span>下載 PDF</span>
-        </a>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   },
 
   // --- Student Works Gallery ---
@@ -898,6 +938,33 @@ const App = {
     if (modal) modal.classList.add('hidden');
     if (container) container.innerHTML = '';
     document.body.classList.remove('modal-open');
+  },
+
+  openPdfModal(url, encodedTitle) {
+    const modal = document.getElementById('videoModal');
+    const titleEl = document.getElementById('videoModalTitle');
+    const container = document.getElementById('videoPlayerContainer');
+    if (!modal || !container) return;
+
+    const title = decodeURIComponent(encodedTitle || '成果簡報 PDF 預覽');
+    if (titleEl) titleEl.innerText = title;
+
+    container.innerHTML = `
+      <div class="flex flex-col gap-3">
+        <div class="flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-700 text-xs text-slate-300">
+          <span>📱 若行動裝置無法直接捲動多頁 PDF，可點右側於新分頁開啟或下載：</span>
+          <div class="flex items-center gap-2">
+            <a href="${url}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold">↗ 新分頁開啟</a>
+            <a href="${url}" download class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold">💾 下載原檔</a>
+          </div>
+        </div>
+        <iframe src="${url}#toolbar=1" class="w-full h-[70vh] rounded-xl border border-slate-700 bg-white"></iframe>
+      </div>
+    `;
+
+    modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+    if (window.lucide) lucide.createIcons();
   },
 
   // --- Navigation & Mobile Menu UX ---

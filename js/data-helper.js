@@ -652,10 +652,19 @@ window.YONGZHEN_RAW_DATA = {
     ],
     "documents": [
         {
+            "id": "20260609_nobgm",
+            "title": "【NoBGM成果】2026畢業成果展.pdf",
+            "body": "教育部跨領域美感教育卓越領航計畫・苗栗永貞國小六年甲班成果展完整簡報（鍾瑞蓉校長領航、彭仁星主任、黃欣怡主任、徐秉鴻教師跨域實踐暨六年甲班全體畢業學生策展｜清華大學羅仕龍教授指導）",
+            "file_url": "assets/docs/【NoBGM成果】2026畢業成果展.pdf",
+            "online_url": "assets/docs/【NoBGM成果】2026畢業成果展.pdf",
+            "cover_url": "assets/docs/【NoBGM成果】2026畢業成果展_cover.jpg",
+            "type": "document"
+        },
+        {
             "id": "3967543443",
-            "title": "永貞徐秉鴻-跨域美感-幾何美學",
-            "body": "",
-            "file_url": "assets/docs/wish_3967543443.pdf",
+            "title": "【美數．數美】幾何對稱與形變成果簡報（20260916-Geometric_Art.pdf）",
+            "body": "跨領域美感教育卓越領航計畫合作學校成果簡報（點線面構成、幾何對稱與形變、正四面體構築）",
+            "file_url": "assets/docs/20260916-Geometric_Art.pdf",
             "online_url": "https://u1.padletusercontent.com/uploads/padlet-uploads-usc1/2633604001/2e27b1eca3b1bcfffce733af2f76e285/_______________.pdf?expiry_token=5WaHZRdGG3LkUVQGy3SZ-zdRtq89aJeottSBaF_Hii8dmxJqYDvE2-MDbblcM-ZrVekXW99RReKkJFIoMoKio2bPgpfz1zCOv5GmYa26UsWaCZSKNGeXWJJdkQ62WPOzz6iLZfTSKTKHcNLy_1rgYqR4amDHEXf_MvheCsyjsHkKzf40fxhLAN_1yPct53qRaMnD0Zc14b_jKtD-bmeWAgUbph8c0GpPbLW3L5q3llc=",
             "type": "document"
         },
