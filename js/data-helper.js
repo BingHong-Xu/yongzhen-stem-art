@@ -678,6 +678,42 @@ window.PADLET_ARCHIVE_DATA = {
       "type": "document"
     },
     {
+      "id": "114_1_poster_explore",
+      "title": "114-1「美數‧數美」幾何與比例的跨領域探索.pdf",
+      "body": "114學年度第1學期課程架構與四大主題教學設計海報（情緒色票、費氏數列與蒙德里安、平面幾何構成、光影藝術實作與展演）",
+      "file_url": "assets/docs/114-1「美數‧數美」幾何與比例的跨領域探索.pdf",
+      "online_url": "assets/docs/114-1「美數‧數美」幾何與比例的跨領域探索.pdf",
+      "cover_url": "assets/docs/114-1「美數‧數美」幾何與比例的跨領域探索_cover.jpg",
+      "type": "document"
+    },
+    {
+      "id": "114_1_poster_experience",
+      "title": "114-1「美數‧數美」結合幾何與比例的跨領域美感課程學習體驗.pdf",
+      "body": "看得見的數學，感受得到的美：114-1 跨領域美感課程學習體驗成果海報（科學之美的理解與建構、美感轉譯、光影敘事展演與多元評量）",
+      "file_url": "assets/docs/114-1「美數‧數美」結合幾何與比例的跨領域美感課程學習體驗.pdf",
+      "online_url": "assets/docs/114-1「美數‧數美」結合幾何與比例的跨領域美感課程學習體驗.pdf",
+      "cover_url": "assets/docs/114-1「美數‧數美」結合幾何與比例的跨領域美感課程學習體驗_cover.jpg",
+      "type": "document"
+    },
+    {
+      "id": "114_2_poster_explore",
+      "title": "114-2「美數‧數美」幾何與比例的跨域探索.pdf",
+      "body": "114學年度第2學期課程架構與跨域探索海報（垂直與水平比例分割、謝爾賓斯基四面體立體構築、窗花鑲嵌與蘆竹湳文化符碼）",
+      "file_url": "assets/docs/114-2「美數‧數美」幾何與比例的跨域探索.pdf",
+      "online_url": "assets/docs/114-2「美數‧數美」幾何與比例的跨域探索.pdf",
+      "cover_url": "assets/docs/114-2「美數‧數美」幾何與比例的跨域探索_cover.jpg",
+      "type": "document"
+    },
+    {
+      "id": "114_2_poster_learning",
+      "title": "114-2 「美數‧數美」跨領域美感學習.pdf",
+      "body": "苗栗縣頭份市永貞國民小學 114-2 跨領域美感學習成果海報（蒙德里安幾何分割、謝爾賓斯基四面體藝廊燈罩、在地老屋顏與 SEL 融合實踐）",
+      "file_url": "assets/docs/114-2 「美數‧數美」跨領域美感學習.pdf",
+      "online_url": "assets/docs/114-2 「美數‧數美」跨領域美感學習.pdf",
+      "cover_url": "assets/docs/114-2 「美數‧數美」跨領域美感學習_cover.jpg",
+      "type": "document"
+    },
+    {
       "id": "3967543443",
       "title": "【美數．數美】幾何對稱與形變成果簡報（20260916-Geometric_Art.pdf）",
       "body": "跨領域美感教育卓越領航計畫合作學校成果簡報（點線面構成、幾何對稱與形變、正四面體構築）",
