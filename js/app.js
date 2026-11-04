@@ -338,12 +338,16 @@ const App = {
       return `
         <div class="glass-card p-4 sm:p-5 rounded-2xl border border-indigo-500/30 flex items-center justify-between gap-4 hover:border-indigo-400 transition-all flex-wrap sm:flex-nowrap">
           <div class="flex items-center gap-3.5 min-w-0 flex-1">
-            <div class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center flex-shrink-0">
-              <i data-lucide="file-text" class="w-5 h-5"></i>
-            </div>
+            ${doc.cover_url ? `
+              <img src="${doc.cover_url}" alt="${doc.title}" class="w-12 h-16 object-cover rounded-lg border border-indigo-500/40 flex-shrink-0 cursor-pointer hover:scale-105 transition-transform" onclick="App.openPdfModal('${targetHref}', '${encodeURIComponent(doc.title)}')">
+            ` : `
+              <div class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="file-text" class="w-5 h-5"></i>
+              </div>
+            `}
             <div class="min-w-0">
               <h4 class="text-sm font-bold text-white truncate">${doc.title}</h4>
-              <p class="text-xs text-slate-400 truncate">${doc.body || '跨領域美感課程完整教學手冊與成果簡報檔案'}</p>
+              <p class="text-xs text-slate-400 line-clamp-2">${doc.body || '跨領域美感課程完整教學手冊與成果簡報檔案'}</p>
             </div>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
